@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+      name: usuarios
+  datasource:
+    url: jdbc:mysql://localhost:3307/bandas_db_user?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+    username: bandas_user
+    password: bandas_pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create  # Usar 'create' si quieres que borre y rehaga todo en cada arranque
+                        # Usar 'update' para que actualice el esquema sin perder datos
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
