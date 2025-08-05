@@ -6,8 +6,6 @@ import com.tfm.bandas.usuarios.model.entity.User;
 import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
 import com.tfm.bandas.usuarios.model.repository.RoleRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
-import com.trabajo.gestion.bandas.usuarios.model.repository.*;
-import com.trabajo.gestion.bandas.usuarios.model.entity.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

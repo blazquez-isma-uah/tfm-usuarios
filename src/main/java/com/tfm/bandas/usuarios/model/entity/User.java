@@ -33,11 +33,7 @@ public class User {
 
     private String passwordHash;
 
-    @Column(nullable = false)
-    @NotNull
     private LocalDate birthDate;
-    @Column(nullable = false)
-    @NotNull
     private LocalDate bandJoinDate;       // Fecha en la que se unió a la banda
     private LocalDate systemSignupDate;   // Fecha de alta en el sistema
     private LocalDateTime lastLoginDate;  // Fecha del último inicio de sesión

@@ -18,6 +18,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
+        System.out.println("Fetching all users");
         return userRepo.findAll();
     }
 }

@@ -1,0 +1,20 @@
+# Register a new user
+curl -X POST http://localhost:8080/auth/register \
+-H "Content-Type: application/json" \
+-H "Accept-Charset: utf-8" \
+-d '{"firstName":"Luis", "lastName":"Perez", "secondlastName":"Garcia", "email":"luis@test.com", "password":"123456"}'
+
+# Login with valid credentials
+curl -X POST http://localhost:8080/auth/login \
+-H "Content-Type: application/json" \
+-d '{"email":"luis@test.com", "password":"123456"}'
+
+
+# Users with invalid credentials
+curl -i http://localhost:8080/api/users
+# Resultado: 401 Unauthorized
+
+# Users with valid credentials
+curl -i http://localhost:8080/api/users \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWlzQHRlc3QuY29tIiwiaWF0IjoxNzU0NDIxNDkxLCJleHAiOjE3NTQ0MjUwOTF9.5s0Doultms-dUy4MbdCp_8GswaXOLIeYrXDQnds4IzA"
+
