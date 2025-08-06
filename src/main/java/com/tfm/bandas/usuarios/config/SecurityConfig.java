@@ -1,6 +1,6 @@
 package com.tfm.bandas.usuarios.config;
 
-import jakarta.servlet.http.HttpServletResponse;
+import com.tfm.bandas.usuarios.auth.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,32 +12,37 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
+    public SecurityConfig(JwtFilter jwtFilter,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAccessDeniedHandler jwtAccessDeniedHandler) {
         this.jwtFilter = jwtFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Desactivar CSRF
-                // Spring no debe crear sesiones (ni cookies ni JSESSION) para manejar la autenticación
+                // configura la política de creación de sesiones como Stateless para que no se creen sesiones en el servidor.
+                // Esto es importante para APIs REST, ya que cada solicitud debe ser independiente y no depender de un estado de sesión en el servidor.
+                // Con esta configuración, Spring Security no intentará crear o mantener sesiones de usuario, lo que es adecuado para aplicaciones RESTful donde cada solicitud debe ser
+                // independiente y no debe depender de un estado de sesión en el servidor.
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Configurar la autenticación por defecto
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(
-                                (req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
-                        )
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Manejo de errores de autenticación
+                        .accessDeniedHandler(jwtAccessDeniedHandler) // Manejo de errores de acceso denegado
                 )
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/**").permitAll()  // público
                     //.anyRequest().permitAll() // Permitir todo
                     .anyRequest().authenticated() // Requiere autenticación
                 )
-
-        // Añadir el filtro JWT antes de la autenticación por defecto
-        .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
-
+                // Añadir el filtro JWT antes de la autenticación por defecto
+                .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();

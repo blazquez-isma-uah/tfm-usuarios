@@ -4,6 +4,7 @@ import com.tfm.bandas.usuarios.model.entity.Role;
 import com.tfm.bandas.usuarios.model.entity.User;
 import com.tfm.bandas.usuarios.model.repository.RoleRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,5 +66,29 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getEmail());
         return new AuthResponse(token);
     }
+
+    @PostMapping("/refresh")
+    public AuthResponse refreshToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.validateTokenAndGetSubject(token);
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Validar que el token todavía no está expirado
+        if (jwtUtil.isTokenExpiringSoon(token, 300000)) { // 5 minutos
+            String newToken = jwtUtil.generateToken(user.getEmail());
+            return new AuthResponse(newToken);
+        } else {
+            throw new RuntimeException("Token not close to expiration");
+        }
+    }
+
 
 }

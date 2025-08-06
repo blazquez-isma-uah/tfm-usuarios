@@ -9,6 +9,7 @@ import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -20,6 +21,9 @@ public class DataInitializer {
     public CommandLineRunner initData(UserRepository userRepo,
                                       RoleRepository roleRepo,
                                       InstrumentRepository instrumentRepo) {
+        // Inyectar el codificador de contraseñas
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
         return args -> {
 
             // Crear roles si no existen
@@ -44,11 +48,11 @@ public class DataInitializer {
             // Crear usuario de prueba
             if (!userRepo.existsByEmail("test@bandas.com")) {
                 User testUser = new User();
-                testUser.setFirstName("Ismael");
-                testUser.setLastName("Blázquez");
-                testUser.setSecondLastName("Carabias");
+                testUser.setFirstName("UsuarioTest");
+                testUser.setLastName("ApellidoTest");
+                testUser.setSecondLastName("Apellido2Test");
                 testUser.setEmail("test@bandas.com");
-                testUser.setPasswordHash("$2a$10$e.jvEjUaeR4Jc9Q2M8OJo.RkWfmr02v4v7C9AAGz7okd0KmVaTI.C"); // "123456" codificada con BCrypt
+                testUser.setPasswordHash(passwordEncoder.encode("123456"));
                 testUser.setBirthDate(LocalDate.of(1990, 1, 1));
                 testUser.setBandJoinDate(LocalDate.of(2010, 9, 1));
                 testUser.setSystemSignupDate(LocalDate.now());
@@ -56,11 +60,33 @@ public class DataInitializer {
                 testUser.setPhone("600123456");
                 testUser.setNotes("Usuario de prueba inicial");
                 testUser.setProfilePictureUrl(null);
-                testUser.setRoles(Set.of(adminRole, musicianRole));
-                testUser.setInstruments(Set.of(trumpet1, clarinet1));
+                testUser.setRoles(Set.of(musicianRole));
+                testUser.setInstruments(Set.of(clarinet1));
 
                 userRepo.save(testUser);
             }
+
+            // Crear más usuarios de prueba si es necesario
+            if (!userRepo.existsByEmail("ismael@bandas.com")) {
+                User ismaelUser = new User();
+                ismaelUser.setFirstName("Ismael");
+                ismaelUser.setLastName("Blazquez");
+                ismaelUser.setSecondLastName("Carabias");
+                ismaelUser.setEmail("ismael@bandas.com");
+                ismaelUser.setPasswordHash(passwordEncoder.encode("123456"));
+                ismaelUser.setBirthDate(LocalDate.of(1996, 5, 4));
+                ismaelUser.setBandJoinDate(LocalDate.of(2008, 11, 1));
+                ismaelUser.setSystemSignupDate(LocalDate.now().minusDays(1));
+                ismaelUser.setActive(true);
+                ismaelUser.setPhone("6665544321");
+//                ismaelUser.setNotes("Usuario de prueba inicial");
+                ismaelUser.setProfilePictureUrl(null);
+                ismaelUser.setRoles(Set.of(adminRole, musicianRole));
+                ismaelUser.setInstruments(Set.of(trumpet1, trumpet2));
+
+                userRepo.save(ismaelUser);
+            }
         };
     }
+
 }

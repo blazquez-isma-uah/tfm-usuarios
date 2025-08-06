@@ -7,7 +7,7 @@ curl -X POST http://localhost:8080/auth/register \
 # Login with valid credentials
 curl -X POST http://localhost:8080/auth/login \
 -H "Content-Type: application/json" \
--d '{"email":"luis@test.com", "password":"123456"}'
+-d '{"email":"ismael@bandas.com", "password":"123456"}'
 
 
 # Users with invalid credentials
@@ -17,4 +17,24 @@ curl -i http://localhost:8080/api/users
 # Users with valid credentials
 curl -i http://localhost:8080/api/users \
 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWlzQHRlc3QuY29tIiwiaWF0IjoxNzU0NDIxNDkxLCJleHAiOjE3NTQ0MjUwOTF9.5s0Doultms-dUy4MbdCp_8GswaXOLIeYrXDQnds4IzA"
+
+
+
+
+
+## EJEMPLO PARA REFRESH DE TOKEN
+# Login para obtener token
+curl -X POST http://localhost:8080/auth/login \
+-H "Content-Type: application/json" \
+-d '{"email":"test@bandas.com","password":"123456"}'
+
+# Refresh del token
+curl -X POST http://localhost:8080/auth/refresh \
+-H "Authorization: Bearer <TOKEN_ACTUAL>"
+
+
+
+
+
+
 

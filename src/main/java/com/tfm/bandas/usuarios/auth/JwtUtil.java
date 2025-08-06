@@ -2,6 +2,7 @@ package com.tfm.bandas.usuarios.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -11,7 +12,9 @@ import java.util.Date;
 public class JwtUtil {
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long expirationMs = 3600000; // 1h
+    @Value("${jwt.expiration-ms:3600000}") // 1h por defecto
+    private long expirationMs;
+
 
     public String generateToken(String email) {
         return Jwts.builder()
@@ -29,6 +32,17 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public boolean isTokenExpiringSoon(String token, long thresholdMs) {
+        Date expirationDate = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        long timeToExpire = expirationDate.getTime() - System.currentTimeMillis();
+        return timeToExpire < thresholdMs;
     }
 
 }

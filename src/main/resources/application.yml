@@ -24,3 +24,6 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+
+jwt:
+  expiration-ms: 7200000  # 2 horas

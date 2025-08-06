@@ -1,7 +1,6 @@
-package com.tfm.bandas.usuarios.config;
+package com.tfm.bandas.usuarios.auth;
 
 
-import com.tfm.bandas.usuarios.auth.JwtUtil;
 import com.tfm.bandas.usuarios.model.entity.User;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import jakarta.servlet.*;
