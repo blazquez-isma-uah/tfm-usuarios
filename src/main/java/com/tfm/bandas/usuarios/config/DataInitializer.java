@@ -34,15 +34,15 @@ public class DataInitializer {
 
             // Crear instrumentos
             Instrument trumpet1 = instrumentRepo
-                    .findByNameAndVoice("Trumpet", "1")
+                    .findByInstrumentNameAndVoice("Trumpet", "1")
                     .orElseGet(() -> instrumentRepo.save(new Instrument("Trumpet", "1")));
 
             Instrument trumpet2 = instrumentRepo
-                    .findByNameAndVoice("Trumpet", "2")
+                    .findByInstrumentNameAndVoice("Trumpet", "2")
                     .orElseGet(() -> instrumentRepo.save(new Instrument("Trumpet", "2")));
 
             Instrument clarinet1 = instrumentRepo
-                    .findByNameAndVoice("Clarinet", "1")
+                    .findByInstrumentNameAndVoice("Clarinet", "1")
                     .orElseGet(() -> instrumentRepo.save(new Instrument("Clarinet", "1")));
 
             // Crear usuario de prueba

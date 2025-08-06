@@ -21,7 +21,7 @@ public class Instrument {
 
     @Column(nullable = false)
     @NotNull
-    private String name; // Ej: "Trompeta", "Clarinete"
+    private String instrumentName; // Ej: "Trompeta", "Clarinete"
     @Column(nullable = false)
     @NotNull
     private String voice; // Ej: "1", "2", "Principal"
@@ -33,13 +33,9 @@ public class Instrument {
     public Instrument() {
     }
 
-    public Instrument(String name, String voice) {
-        this.name = name;
+    public Instrument(String instrumentName, String voice) {
+        this.instrumentName = instrumentName;
         this.voice = voice;
     }
 
-    @Override
-    public String toString() {
-        return name + " " + voice;
-    }
 }

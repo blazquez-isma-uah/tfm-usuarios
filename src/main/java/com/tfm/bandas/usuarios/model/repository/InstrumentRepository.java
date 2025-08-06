@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface InstrumentRepository extends JpaRepository<Instrument, Long> {
 
-    Optional<Instrument> findByNameAndVoice(String instrumentName, String voice);
+    Optional<Instrument> findByInstrumentNameAndVoice(String instrumentName, String voice);
 }
