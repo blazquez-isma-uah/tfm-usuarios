@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -37,8 +38,12 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler) // Manejo de errores de acceso denegado
                 )
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/**").permitAll()  // público
-                    //.anyRequest().permitAll() // Permitir todo
+                        .requestMatchers(
+                                "/auth/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll() // Permitir
                     .anyRequest().authenticated() // Requiere autenticación
                 )
                 // Añadir el filtro JWT antes de la autenticación por defecto
@@ -46,5 +51,10 @@ public class SecurityConfig {
         ;
 
         return http.build();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

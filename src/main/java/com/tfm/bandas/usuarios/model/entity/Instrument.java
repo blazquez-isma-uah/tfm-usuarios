@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "voice"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"instrumentName", "voice"})})
 public class Instrument {
 
     @Id

@@ -36,6 +36,14 @@ public class InstrumentServiceImpl implements InstrumentService {
     }
 
     @Override
+    public List<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName) {
+        return instrumentRepo.findByInstrumentNameContainingIgnoreCase(instrumentName)
+                .stream()
+                .map(instrumentMapper::toDTO)
+                .toList();
+    }
+
+    @Override
     public InstrumentDTO createInstrument(InstrumentDTO dto) {
         Instrument instrument = new Instrument();
         instrument.setInstrumentName(dto.instrumentName());

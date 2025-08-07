@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface InstrumentRepository extends JpaRepository<Instrument, Long> {
 
     Optional<Instrument> findByInstrumentNameAndVoice(String instrumentName, String voice);
+
+    Optional<Instrument> findByInstrumentNameContainingIgnoreCase(String instrumentName);
 }
