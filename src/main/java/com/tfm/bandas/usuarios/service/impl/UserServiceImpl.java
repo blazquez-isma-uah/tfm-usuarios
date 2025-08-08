@@ -2,6 +2,7 @@ package com.tfm.bandas.usuarios.service.impl;
 
 import com.tfm.bandas.usuarios.dto.UserCreateDTO;
 import com.tfm.bandas.usuarios.dto.UserDTO;
+import com.tfm.bandas.usuarios.dto.UserUpdateDTO;
 import com.tfm.bandas.usuarios.dto.mapper.UserMapper;
 import com.tfm.bandas.usuarios.model.entity.Instrument;
 import com.tfm.bandas.usuarios.model.entity.Role;
@@ -10,6 +11,7 @@ import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
 import com.tfm.bandas.usuarios.model.repository.RoleRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import com.tfm.bandas.usuarios.service.UserService;
+import com.tfm.bandas.usuarios.utils.Constants;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,16 +64,56 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO createUser(UserCreateDTO dto) {
         User user = new User();
-        setUserAttributes(dto, user);
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setSecondLastName(dto.secondLastName());
+        user.setEmail(dto.email());
+        user.setPasswordHash(passwordEncoder.encode(dto.password()));
+        Set<Role> roles = new HashSet<>(roleRepo.findAllById(dto.roleIds()));
+        Set<Instrument> instruments = null;
+        if (dto.instrumentIds() != null && !dto.instrumentIds().isEmpty()) {
+            instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
+        } else {
+            instruments = new HashSet<>();
+        }
+        user.setRoles(roles);
+        user.setInstruments(instruments);
         user.setActive(true);
         return userMapper.toDTO(userRepo.save(user));
     }
 
     @Override
-    public UserDTO updateUser(Long id, UserCreateDTO dto) {
+    public UserDTO updateUser(Long id, UserUpdateDTO dto) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        setUserAttributes(dto, user);
+        if (dto.firstName() != null && !dto.firstName().isEmpty()) {
+            user.setFirstName(dto.firstName());
+        }
+        if (dto.lastName() != null && !dto.lastName().isEmpty()) {
+            user.setLastName(dto.lastName());
+        }
+        user.setSecondLastName(dto.secondLastName());
+
+        if(userRepo.existsByEmail(dto.email())) {
+            throw new RuntimeException("Email already registered: " + dto.email());
+        }
+        if (dto.email() != null && !dto.email().isEmpty()) {
+            user.setEmail(dto.email());
+        }
+        if (dto.password() != null && !dto.password().isEmpty() && !Constants.NOT_ALLOWED_PASSWORDS.contains(dto.password().trim())) {
+            user.setPasswordHash(passwordEncoder.encode(dto.password()));
+        }
+        if (dto.roleIds() != null && !dto.roleIds().isEmpty()) {
+            Set<Role> roles = new HashSet<>(roleRepo.findAllById(dto.roleIds()));
+            user.setRoles(roles);
+        }
+        Set<Instrument> instruments;
+        if (dto.instrumentIds() != null) {
+            instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
+        } else {
+            instruments = new HashSet<>();
+        }
+        user.setInstruments(instruments);
         return userMapper.toDTO(userRepo.save(user));
     }
 
@@ -111,22 +153,17 @@ public class UserServiceImpl implements UserService {
     public UserDTO assignInstruments(Long userId, Set<Long> instrumentIds) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
+        Set<Instrument> instruments = null;
+        if (instrumentIds != null && !instrumentIds.isEmpty()) {
+            instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
+        } else {
+            instruments = new HashSet<>();
+        }
         user.setInstruments(instruments);
         return userMapper.toDTO(userRepo.save(user));
     }
 
     private void setUserAttributes(UserCreateDTO dto, User user) {
-        user.setFirstName(dto.firstName());
-        user.setLastName(dto.lastName());
-        user.setSecondLastName(dto.secondLastName());
-        user.setEmail(dto.email());
-        user.setPasswordHash(passwordEncoder.encode(dto.password()));
 
-        Set<Role> roles = new HashSet<>(roleRepo.findAllById(dto.roleIds()));
-        Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
-
-        user.setRoles(roles);
-        user.setInstruments(instruments);
     }
 }

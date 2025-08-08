@@ -2,6 +2,7 @@ package com.tfm.bandas.usuarios.controller;
 
 import com.tfm.bandas.usuarios.dto.UserCreateDTO;
 import com.tfm.bandas.usuarios.dto.UserDTO;
+import com.tfm.bandas.usuarios.dto.UserUpdateDTO;
 import com.tfm.bandas.usuarios.model.entity.User;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import com.tfm.bandas.usuarios.service.UserService;
@@ -24,7 +25,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping
-    public List<UserDTO> getAllUsers(@PageableDefault(size = 20) Pageable pageable) {
+    public List<UserDTO> getAllUsers(@PageableDefault(size = 10) Pageable pageable) {
         return userService.getAllUsers(pageable);
     }
 
@@ -48,7 +49,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public UserDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserCreateDTO dto) {
+    public UserDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO dto) {
         return userService.updateUser(id, dto);
     }
 

@@ -38,6 +38,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDTO createRole(RoleDTO dto) {
         Role role = new Role();
+        if (dto.name() == null || dto.name().isEmpty()) {
+            throw new IllegalArgumentException("Role name cannot be null or empty");
+        }
+        if (roleRepo.existsByName(dto.name())) {
+            throw new IllegalArgumentException("Role with name '" + dto.name() + "' already exists");
+        }
         role.setName(dto.name());
         role.setDescription(dto.description());
         return roleMapper.toDTO(roleRepo.save(role));

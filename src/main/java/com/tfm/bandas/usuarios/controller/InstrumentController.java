@@ -4,6 +4,8 @@ import com.tfm.bandas.usuarios.dto.InstrumentDTO;
 import com.tfm.bandas.usuarios.service.InstrumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +20,8 @@ public class InstrumentController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping
-    public List<InstrumentDTO> getAll() {
-        return instrumentService.getAllInstruments();
+    public List<InstrumentDTO> getAll(@PageableDefault(size = 10) Pageable pageable) {
+        return instrumentService.getAllInstruments(pageable);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
