@@ -2,6 +2,7 @@ package com.tfm.bandas.usuarios.controller;
 
 import com.tfm.bandas.usuarios.dto.InstrumentDTO;
 import com.tfm.bandas.usuarios.service.InstrumentService;
+import com.tfm.bandas.usuarios.utils.PaginatedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +21,8 @@ public class InstrumentController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping
-    public List<InstrumentDTO> getAll(@PageableDefault(size = 10) Pageable pageable) {
-        return instrumentService.getAllInstruments(pageable);
+    public PaginatedResponse<InstrumentDTO> getAll(@PageableDefault(size = 10) Pageable pageable) {
+        return PaginatedResponse.from(instrumentService.getAllInstruments(pageable));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")

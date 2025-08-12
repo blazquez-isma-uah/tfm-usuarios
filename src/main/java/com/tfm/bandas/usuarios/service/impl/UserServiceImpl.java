@@ -12,12 +12,12 @@ import com.tfm.bandas.usuarios.model.repository.RoleRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import com.tfm.bandas.usuarios.service.UserService;
 import com.tfm.bandas.usuarios.utils.Constants;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -40,11 +40,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers(Pageable pageable) {
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
         return userRepo.findAll(pageable)
-                .stream()
-                .map(userMapper::toDTO)
-                .toList();
+                .map(userMapper::toDTO);
     }
 
     @Override

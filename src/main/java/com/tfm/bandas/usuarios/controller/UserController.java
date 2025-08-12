@@ -6,6 +6,7 @@ import com.tfm.bandas.usuarios.dto.UserUpdateDTO;
 import com.tfm.bandas.usuarios.model.entity.User;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import com.tfm.bandas.usuarios.service.UserService;
+import com.tfm.bandas.usuarios.utils.PaginatedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +26,8 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping
-    public List<UserDTO> getAllUsers(@PageableDefault(size = 10) Pageable pageable) {
-        return userService.getAllUsers(pageable);
+    public PaginatedResponse<UserDTO> getAllUsers(@PageableDefault(size = 10) Pageable pageable) {
+        return PaginatedResponse.from(userService.getAllUsers(pageable));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")

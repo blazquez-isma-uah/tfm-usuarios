@@ -3,13 +3,14 @@ package com.tfm.bandas.usuarios.service;
 import com.tfm.bandas.usuarios.dto.UserCreateDTO;
 import com.tfm.bandas.usuarios.dto.UserDTO;
 import com.tfm.bandas.usuarios.dto.UserUpdateDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Set;
 
 public interface UserService {
-    List<UserDTO> getAllUsers(Pageable pageable);
+    Page<UserDTO> getAllUsers(Pageable pageable);
     UserDTO getUserById(Long id);
     UserDTO getUserByEmail(String email);
     UserDTO createUser(UserCreateDTO dto);

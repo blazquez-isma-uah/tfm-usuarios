@@ -5,6 +5,7 @@ import com.tfm.bandas.usuarios.dto.mapper.InstrumentMapper;
 import com.tfm.bandas.usuarios.model.entity.Instrument;
 import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
 import com.tfm.bandas.usuarios.service.InstrumentService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,9 @@ public class InstrumentServiceImpl implements InstrumentService {
     }
 
     @Override
-    public List<InstrumentDTO> getAllInstruments(Pageable pageable) {
+    public Page<InstrumentDTO> getAllInstruments(Pageable pageable) {
         return instrumentRepo.findAll(pageable)
-                .stream()
-                .map(instrumentMapper::toDTO)
-                .toList();
+                .map(instrumentMapper::toDTO);
     }
 
     @Override
