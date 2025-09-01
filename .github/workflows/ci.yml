@@ -1,0 +1,27 @@
+name: CI - Build & Test
+# Este workflow va a realizar un build y test del proyecto en cada push o pull request a las ramas main o develop
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+
+jobs:
+  # El trabajo de construcción y prueba
+  # Se ejecuta en un entorno Ubuntu
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+        # Paso para revisar el código del repositorio. Esto es necesario para que los siguientes pasos tengan acceso al código fuente.
+      - uses: actions/checkout@v4
+      # Paso para configurar JDK 21 usando la acción oficial de GitHub para configurar Java.
+      # También habilita el caché de dependencias de Maven para acelerar las construcciones futuras
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+        # Paso para construir y probar el proyecto usando Maven. El comando `mvn -B -DskipTests=false clean verify` limpia el proyecto, compila el código y ejecuta las pruebas.
+        # Si alguna prueba falla, este paso fallará y el workflow se detendrá.
+      - name: Build & Test
+        run: mvn -B -DskipTests=false clean verify
