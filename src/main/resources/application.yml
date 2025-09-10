@@ -6,7 +6,6 @@ spring:
       name: usuarios
   datasource:
     url: jdbc:mysql://localhost:3307/bandas_db_user?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-
     username: bandas_user
     password: bandas_pass
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -32,3 +31,19 @@ logging:
   level:
     org.springdoc: DEBUG
     org.springframework.web: INFO
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
