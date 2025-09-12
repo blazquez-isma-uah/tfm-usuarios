@@ -12,25 +12,31 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create  # Usar 'create' si quieres que borre y rehaga todo en cada arranque
+      ddl-auto: update  # Usar 'create' si quieres que borre y rehaga todo en cada arranque
                         # Usar 'update' para que actualice el esquema sin perder datos
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
 
-jwt:
-  expiration-ms: 7200000  # 2 horas
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/tfm-bandas
+          # Alternativa equivalente:
+          # jwk-set-uri: http://localhost:8080/realms/tfm/protocol/openid-connect/certs
 
 logging:
   level:
     org.springdoc: DEBUG
     org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
 
 springdoc:
   swagger-ui:

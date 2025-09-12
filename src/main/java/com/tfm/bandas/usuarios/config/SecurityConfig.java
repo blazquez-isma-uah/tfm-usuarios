@@ -1,60 +1,67 @@
 package com.tfm.bandas.usuarios.config;
 
-import com.tfm.bandas.usuarios.auth.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
-    public SecurityConfig(JwtFilter jwtFilter,
-                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                          JwtAccessDeniedHandler jwtAccessDeniedHandler) {
-        this.jwtFilter = jwtFilter;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
-    }
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        JwtAuthenticationConverter conv = new JwtAuthenticationConverter();
+        conv.setJwtGrantedAuthoritiesConverter(SecurityConfig::extractRealmRoles);
+
         http
-                .csrf(AbstractHttpConfigurer::disable) // Desactivar CSRF
-                // configura la política de creación de sesiones como Stateless para que no se creen sesiones en el servidor.
-                // Esto es importante para APIs REST, ya que cada solicitud debe ser independiente y no depender de un estado de sesión en el servidor.
-                // Con esta configuración, Spring Security no intentará crear o mantener sesiones de usuario, lo que es adecuado para aplicaciones RESTful donde cada solicitud debe ser
-                // independiente y no debe depender de un estado de sesión en el servidor.
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Manejo de errores de autenticación
-                        .accessDeniedHandler(jwtAccessDeniedHandler) // Manejo de errores de acceso denegado
-                )
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsCfg()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**"
-                        ).permitAll() // Permitir
-                    .anyRequest().authenticated() // Requiere autenticación
+                        .requestMatchers("/actuator/health", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Ajusta según tu API:
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN","MUSICIAN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,  "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/users/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-                // Añadir el filtro JWT antes de la autenticación por defecto
-                .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
-        ;
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(conv)));
 
         return http.build();
     }
 
+    private static Collection<GrantedAuthority> extractRealmRoles(Jwt jwt) {
+        var out = new HashSet<SimpleGrantedAuthority>();
+        var realm = jwt.getClaimAsMap("realm_access");
+        if (realm != null && realm.get("roles") instanceof List<?> roles) {
+            for (Object r : roles) out.add(new SimpleGrantedAuthority("ROLE_" + r.toString()));
+        }
+        return new HashSet<GrantedAuthority>(out);
+    }
+
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    CorsConfigurationSource corsCfg() {
+        var cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        cfg.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        cfg.setAllowCredentials(true);
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
     }
 }

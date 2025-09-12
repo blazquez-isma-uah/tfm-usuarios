@@ -34,7 +34,19 @@ services:
       SPRING_DATASOURCE_USERNAME: bandas_user
       SPRING_DATASOURCE_PASSWORD: bandas_pass
       SPRING_PROFILES_ACTIVE: prod
-    ports: ["8080:8080"]
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/tfm-bandas/protocol/openid-connect/certs
+    ports: ["8081:8080"] # Mapear el puerto 8080 del contenedor al 8081 del host
+    networks: [bandas-network]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: ["start-dev"]              # Dev mode (H2). Para prod: Postgres + start
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports: ["8080:8080"] # Mapear el puerto 8080 del contenedor al 8080 del host
+    # Aunque usuarios ya utiliza puerto 8080 en el host, no hay conflicto porque Keycloak y usuarios están en contenedores separados
+    # y el mapeo de puertos es independiente para cada contenedor.
     networks: [bandas-network]
 
 volumes:

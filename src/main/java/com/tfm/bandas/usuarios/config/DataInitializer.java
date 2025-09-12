@@ -9,12 +9,12 @@ import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.*;
 
-@Configuration
+//@Configuration
 public class DataInitializer {
 
 //    @Bean
@@ -89,7 +89,9 @@ public class DataInitializer {
 //        };
 //    }
 
-    @Bean
+
+/*
+    //@Bean
     public CommandLineRunner initData(UserRepository userRepo,
                                       RoleRepository roleRepo,
                                       InstrumentRepository instrumentRepo,
@@ -194,5 +196,5 @@ public class DataInitializer {
 
         };
     }
-
+*/
 }

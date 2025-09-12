@@ -26,16 +26,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final InstrumentRepository instrumentRepo;
-    private final BCryptPasswordEncoder passwordEncoder;
+//    private final BCryptPasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     public UserServiceImpl(UserRepository userRepo, RoleRepository roleRepo,
-                           InstrumentRepository instrumentRepo, BCryptPasswordEncoder passwordEncoder,
+                           InstrumentRepository instrumentRepo, /*BCryptPasswordEncoder passwordEncoder,*/
                            UserMapper userMapper) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.instrumentRepo = instrumentRepo;
-        this.passwordEncoder = passwordEncoder;
+//        this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
     }
 
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(dto.lastName());
         user.setSecondLastName(dto.secondLastName());
         user.setEmail(dto.email());
-        user.setPasswordHash(passwordEncoder.encode(dto.password()));
+//        user.setPasswordHash(passwordEncoder.encode(dto.password()));
         Set<Role> roles = new HashSet<>(roleRepo.findAllById(dto.roleIds()));
         Set<Instrument> instruments = null;
         if (dto.instrumentIds() != null && !dto.instrumentIds().isEmpty()) {
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(dto.email());
         }
         if (dto.password() != null && !dto.password().isEmpty() && !Constants.NOT_ALLOWED_PASSWORDS.contains(dto.password().trim())) {
-            user.setPasswordHash(passwordEncoder.encode(dto.password()));
+//            user.setPasswordHash(passwordEncoder.encode(dto.password()));
         }
         if (dto.roleIds() != null && !dto.roleIds().isEmpty()) {
             Set<Role> roles = new HashSet<>(roleRepo.findAllById(dto.roleIds()));
