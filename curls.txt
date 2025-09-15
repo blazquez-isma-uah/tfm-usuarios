@@ -41,12 +41,12 @@ KC=http://localhost:8080
 curl -s -X POST "$KC/realms/tfm-bandas/protocol/openid-connect/token" \
   -d grant_type=password \
   -d client_id=frontend-local \
-  -d username=admin \
-  -d password=admin123 | jq -r .access_token > /tmp/tok.txt
+  -d username=ismablazquez \
+  -d password=123456 | jq -r .access_token > /tmp/tok.txt
 
 cat /tmp/tok.txt | awk -F. '{print $2}' | base64 -d 2>/dev/null | jq
 
-curl -i http://localhost:8081/api/users/21 \
+curl -i http://localhost:8081/api/users/20 \
   -H "Authorization: Bearer $(cat /tmp/tok.txt)"
 
 curl -i -X DELETE http://localhost:8081/api/users/21 \

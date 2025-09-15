@@ -29,7 +29,7 @@ USER appuser
 COPY --from=build /app/target/*.jar /app/app.jar
 
 # Puerto de la app
-EXPOSE 8081
+EXPOSE 8080
 
 # Variables típicas (puedes sobreescribirlas en compose/Actions)
 ENV SPRING_PROFILES_ACTIVE=prod \
