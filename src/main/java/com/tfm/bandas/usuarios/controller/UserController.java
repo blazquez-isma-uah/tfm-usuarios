@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -36,6 +38,13 @@ public class UserController {
     @GetMapping("/email/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email);
+    }
+
+    // get user by iamId solo para admin
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/iam/{iamId}")
+    public UserDTO getUserByIamId(@PathVariable String iamId) {
+        return userService.getUserByIamId(iamId);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -83,4 +92,11 @@ public class UserController {
         return userService.getUserByIamId(iamId);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
+    @GetMapping("/me")
+    public UserDTO getMyProfile(@AuthenticationPrincipal Jwt jwt) {
+        // El claim "sub" de JWT es el que corresponde al iamId
+        String iamId = jwt.getSubject();
+        return userService.getUserByIamId(iamId);
+    }
 }
