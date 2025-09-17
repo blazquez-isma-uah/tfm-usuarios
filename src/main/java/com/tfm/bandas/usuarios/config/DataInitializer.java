@@ -1,18 +1,7 @@
 package com.tfm.bandas.usuarios.config;
 
-import com.tfm.bandas.usuarios.model.entity.Instrument;
-import com.tfm.bandas.usuarios.model.entity.Role;
-import com.tfm.bandas.usuarios.model.entity.User;
-import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
-import com.tfm.bandas.usuarios.model.repository.RoleRepository;
-import com.tfm.bandas.usuarios.model.repository.UserRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDate;
-import java.util.*;
 
 //@Configuration
 public class DataInitializer {

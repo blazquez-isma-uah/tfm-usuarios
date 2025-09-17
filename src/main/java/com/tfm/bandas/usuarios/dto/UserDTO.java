@@ -9,6 +9,5 @@ public record UserDTO(
         String lastName,
         String secondLastName,
         String email,
-        Set<String> roles,
         Set<String> instruments
 ) {}

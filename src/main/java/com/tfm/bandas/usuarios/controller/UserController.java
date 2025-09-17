@@ -2,9 +2,6 @@ package com.tfm.bandas.usuarios.controller;
 
 import com.tfm.bandas.usuarios.dto.UserCreateDTO;
 import com.tfm.bandas.usuarios.dto.UserDTO;
-import com.tfm.bandas.usuarios.dto.UserUpdateDTO;
-import com.tfm.bandas.usuarios.model.entity.User;
-import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import com.tfm.bandas.usuarios.service.UserService;
 import com.tfm.bandas.usuarios.utils.PaginatedResponse;
 import jakarta.validation.Valid;
@@ -14,7 +11,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -50,7 +46,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public UserDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserUpdateDTO dto) {
+    public UserDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserCreateDTO dto) {
         return userService.updateUser(id, dto);
     }
 
@@ -73,15 +69,18 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}/assign-roles")
-    public UserDTO assignRoles(@PathVariable Long id, @RequestBody Set<Long> roleIds) {
-        return userService.assignRoles(id, roleIds);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/assign-instruments")
     public UserDTO assignInstruments(@PathVariable Long id, @RequestBody Set<Long> instrumentIds) {
         return userService.assignInstruments(id, instrumentIds);
+    }
+
+    // /api/users/me devuelve el perfil del usuario autenticado (extrae sub del token JWT y busca en DB con keycloakId).
+    @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
+    @GetMapping("/me")
+    public UserDTO getMyProfile() {
+        // Extrae el IAM ID del usuario autenticado desde el contexto de seguridad
+        String iamId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.getUserByIamId(iamId);
     }
 
 }

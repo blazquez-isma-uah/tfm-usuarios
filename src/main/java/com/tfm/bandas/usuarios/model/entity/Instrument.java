@@ -28,7 +28,7 @@ public class Instrument {
 
     @ManyToMany(mappedBy = "instruments")
     @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    private Set<UserProfile> userProfiles = new HashSet<>();
 
     public Instrument() {
     }
