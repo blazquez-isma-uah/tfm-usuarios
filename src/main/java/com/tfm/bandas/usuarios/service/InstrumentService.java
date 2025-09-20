@@ -12,4 +12,5 @@ public interface InstrumentService {
     List<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName);
     InstrumentDTO createInstrument(InstrumentDTO dto);
     void deleteInstrument(Long id);
+    Page<InstrumentDTO> searchInstruments(String name, String voice, Pageable pageable);
 }

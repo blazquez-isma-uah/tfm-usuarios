@@ -3,17 +3,22 @@ package com.tfm.bandas.usuarios.service.impl;
 import com.tfm.bandas.usuarios.dto.UserCreateDTO;
 import com.tfm.bandas.usuarios.dto.UserDTO;
 import com.tfm.bandas.usuarios.dto.mapper.UserMapper;
+import com.tfm.bandas.usuarios.exception.BadRequestException;
+import com.tfm.bandas.usuarios.exception.NotFoundException;
 import com.tfm.bandas.usuarios.model.entity.Instrument;
 import com.tfm.bandas.usuarios.model.entity.UserProfile;
 import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
+import com.tfm.bandas.usuarios.model.specifications.UserSpecifications;
 import com.tfm.bandas.usuarios.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,76 +31,69 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UserDTO> getAllUsers(Pageable pageable) {
         return userRepo.findAll(pageable)
                 .map(userMapper::toDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         return userRepo.findById(id)
                 .map(userMapper::toDTO)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDTO getUserByEmail(String email) {
         return userRepo.findByEmail(email)
                 .map(userMapper::toDTO)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDTO getUserByIamId(String iamId) {
         return userRepo.findByIamId(iamId)
                 .map(userMapper::toDTO)
-                .orElseThrow(() -> new RuntimeException("User not found with IAM id: " + iamId));
+                .orElseThrow(() -> new NotFoundException("User not found with IAM id: " + iamId));
     }
 
     @Override
+    @Transactional
     public UserDTO createUser(UserCreateDTO dto) {
         if(userRepo.findByIamId(dto.iamId()).isPresent()) {
-            throw new RuntimeException("User already registered with IAM id: " + dto.iamId());
+            throw new BadRequestException("User already registered with IAM id: " + dto.iamId());
         }
 
         UserProfile userProfile = new UserProfile();
         userProfile.setIamId(dto.iamId());
-        userProfile.setSystemSignupDate(dto.systemSignupDate());
+        userProfile.setSystemSignupDate(dto.systemSignupDate() != null ? dto.systemSignupDate() : LocalDate.now());
         userProfile.setActive(true);
 
         setMainUserInfo(dto, userProfile);
-
-        Set<Instrument> instruments;
-        if (dto.instrumentIds() != null && !dto.instrumentIds().isEmpty()) {
-            instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
-        } else {
-            instruments = new HashSet<>();
-        }
-        userProfile.setInstruments(instruments);
 
         return userMapper.toDTO(userRepo.save(userProfile));
     }
 
     @Override
+    @Transactional
     public UserDTO updateUser(Long id, UserCreateDTO dto) {
         UserProfile userProfile = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
         // NO se actualiza iamId → es inmutable
+        // NO se actualiza systemSignupDate → es inmutable
+        // NO se actualiza active → se hace con endpoints específicos
         // Email y nombres: se supone que ya han sido cambiados en el IdP y se sincronizan aquí
         setMainUserInfo(dto, userProfile);
 
-        Set<Instrument> instruments;
-        if (dto.instrumentIds() != null) {
-            instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
-        } else {
-            instruments = new HashSet<>();
-        }
-        userProfile.setInstruments(instruments);
         return userMapper.toDTO(userRepo.save(userProfile));
     }
 
-    private static void setMainUserInfo(UserCreateDTO dto, UserProfile userProfile) {
+    private void setMainUserInfo(UserCreateDTO dto, UserProfile userProfile) {
         userProfile.setFirstName(dto.firstName());
         userProfile.setLastName(dto.lastName());
         userProfile.setSecondLastName(dto.secondLastName());
@@ -105,44 +103,65 @@ public class UserServiceImpl implements UserService {
         userProfile.setProfilePictureUrl(dto.profilePictureUrl());
         userProfile.setBirthDate(dto.birthDate());
         userProfile.setBandJoinDate(dto.bandJoinDate());
+
+        if (dto.instrumentIds() != null) {
+            Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
+            userProfile.setInstruments(instruments);
+        }
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         if (!userRepo.existsById(id)) {
-            throw new EntityNotFoundException("User not found with id " + id);
+            throw new NotFoundException("User not found with id " + id);
         }
         userRepo.deleteById(id);
     }
 
     @Override
+    @Transactional
     public void disableUser(Long id) {
         UserProfile user = userRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id " + id));
         user.setActive(false);
         userRepo.save(user);
     }
 
     @Override
+    @Transactional
     public void enableUser(Long id) {
         UserProfile user = userRepo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
+                .orElseThrow(() -> new NotFoundException("User not found with id " + id));
         user.setActive(true);
         userRepo.save(user);
     }
 
     @Override
-    public UserDTO assignInstruments(Long userId, Set<Long> instrumentIds) {
+    @Transactional
+    public UserDTO updateUserInstruments(Long userId, Set<Long> instrumentIds) {
         UserProfile userProfile = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        Set<Instrument> instruments = null;
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
         if (instrumentIds != null && !instrumentIds.isEmpty()) {
+            Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
             instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
-        } else {
-            instruments = new HashSet<>();
+            userProfile.setInstruments(instruments);
         }
-        userProfile.setInstruments(instruments);
         return userMapper.toDTO(userRepo.save(userProfile));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserDTO> searchUsers(String firstName, String lastName, String email, Boolean active, Long instrumentId, Pageable pageable) {
+        Specification<UserProfile> spec = Specification.allOf(
+                UserSpecifications.firstNameContains(firstName),
+                UserSpecifications.lastNameContains(lastName),
+                UserSpecifications.emailContains(email),
+                UserSpecifications.activeIs(active),
+                UserSpecifications.hasInstrument(instrumentId)
+        );
+
+        return userRepo.findAll(spec, pageable).map(userMapper::toDTO);
     }
 
 }

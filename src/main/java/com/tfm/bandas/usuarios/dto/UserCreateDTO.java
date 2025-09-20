@@ -1,5 +1,6 @@
 package com.tfm.bandas.usuarios.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -16,10 +17,9 @@ public record UserCreateDTO(
         LocalDate birthDate,
         LocalDate bandJoinDate,
         LocalDate systemSignupDate,
-        boolean active,
-        String phone,
-        String notes,
-        String profilePictureUrl,
+        @Nullable String phone,
+        @Nullable String notes,
+        @Nullable String profilePictureUrl,
         Set<Long> instrumentIds
 ) {}
 

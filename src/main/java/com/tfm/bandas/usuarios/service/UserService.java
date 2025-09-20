@@ -17,5 +17,6 @@ public interface UserService {
     void deleteUser(Long id);
     void disableUser(Long id);
     void enableUser(Long id);
-    UserDTO assignInstruments(Long userId, Set<Long> instrumentIds);
+    UserDTO updateUserInstruments(Long userId, Set<Long> instrumentIds);
+    Page<UserDTO> searchUsers(String firstName, String lastName, String email, Boolean active, Long instrumentId, Pageable pageable);
 }

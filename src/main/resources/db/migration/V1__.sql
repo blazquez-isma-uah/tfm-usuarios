@@ -6,64 +6,62 @@ CREATE TABLE instrument
     CONSTRAINT pk_instrument PRIMARY KEY (id)
 );
 
-CREATE TABLE `role`
-(
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    name          VARCHAR(255) NOT NULL,
-    `description` VARCHAR(255) NULL,
-    CONSTRAINT pk_role PRIMARY KEY (id)
-);
-
-CREATE TABLE user
+CREATE TABLE user_profile
 (
     id                  BIGINT AUTO_INCREMENT NOT NULL,
+    iam_id              VARCHAR(255) NOT NULL,
     first_name          VARCHAR(255) NOT NULL,
-    last_name           VARCHAR(255) NULL,
+    last_name           VARCHAR(255) NOT NULL,
     second_last_name    VARCHAR(255) NULL,
     email               VARCHAR(255) NOT NULL,
-    password_hash       VARCHAR(255) NULL,
     birth_date          date NULL,
     band_join_date      date NULL,
     system_signup_date  date NULL,
-    last_login_date     datetime NULL,
     active              BIT(1)       NOT NULL,
     phone               VARCHAR(255) NULL,
     notes               VARCHAR(255) NULL,
     profile_picture_url VARCHAR(255) NULL,
-    CONSTRAINT pk_user PRIMARY KEY (id)
+    CONSTRAINT pk_user_profile PRIMARY KEY (id)
 );
 
-CREATE TABLE user_instruments
+CREATE TABLE user_profile_instruments
 (
-    instruments_id BIGINT NOT NULL,
-    users_id       BIGINT NOT NULL,
-    CONSTRAINT pk_user_instruments PRIMARY KEY (instruments_id, users_id)
-);
-
-CREATE TABLE user_roles
-(
-    user_id  BIGINT NOT NULL,
-    roles_id BIGINT NOT NULL,
-    CONSTRAINT pk_user_roles PRIMARY KEY (user_id, roles_id)
+    instruments_id   BIGINT NOT NULL,
+    user_profiles_id BIGINT NOT NULL,
+    CONSTRAINT pk_user_profile_instruments PRIMARY KEY (instruments_id, user_profiles_id)
 );
 
 ALTER TABLE instrument
     ADD CONSTRAINT uc_02daaf6f0e93d4aaefde0e689 UNIQUE (instrument_name, voice);
 
-ALTER TABLE `role`
-    ADD CONSTRAINT uc_role_name UNIQUE (name);
+ALTER TABLE user_profile
+    ADD CONSTRAINT uc_user_profile_email UNIQUE (email);
 
-ALTER TABLE user
-    ADD CONSTRAINT uc_user_email UNIQUE (email);
+ALTER TABLE user_profile
+    ADD CONSTRAINT uc_user_profile_iamid UNIQUE (iam_id);
 
-ALTER TABLE user_instruments
-    ADD CONSTRAINT fk_useins_on_instrument FOREIGN KEY (instruments_id) REFERENCES instrument (id);
+ALTER TABLE user_profile_instruments
+    ADD CONSTRAINT fk_useproins_on_instrument FOREIGN KEY (instruments_id) REFERENCES instrument (id);
 
-ALTER TABLE user_instruments
-    ADD CONSTRAINT fk_useins_on_user FOREIGN KEY (users_id) REFERENCES user (id);
+ALTER TABLE user_profile_instruments
+    ADD CONSTRAINT fk_useproins_on_user_profile FOREIGN KEY (user_profiles_id) REFERENCES user_profile (id);
 
-ALTER TABLE user_roles
-    ADD CONSTRAINT fk_userol_on_role FOREIGN KEY (roles_id) REFERENCES `role` (id);
 
-ALTER TABLE user_roles
-    ADD CONSTRAINT fk_userol_on_user FOREIGN KEY (user_id) REFERENCES user (id);
+INSERT INTO instrument (id,instrument_name,voice) VALUES (5,'Clarinete','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (6,'Clarinete','2');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (1,'Director','Principal');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (17,'Fagot','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (7,'Flauta','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (8,'Flauta','Principal');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (14,'Oboe','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (11,'Saxofón','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (12,'Saxofón','2');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (9,'Trombón','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (10,'Trombón','2');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (15,'Trompa','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (16,'Trompa','2');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (2,'Trompeta','1');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (3,'Trompeta','2');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (4,'Trompeta','3');
+INSERT INTO instrument (id,instrument_name,voice) VALUES (13,'Tuba','1');
+

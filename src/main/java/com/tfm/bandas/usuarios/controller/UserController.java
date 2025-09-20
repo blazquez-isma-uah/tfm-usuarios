@@ -80,16 +80,22 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/assign-instruments")
     public UserDTO assignInstruments(@PathVariable Long id, @RequestBody Set<Long> instrumentIds) {
-        return userService.assignInstruments(id, instrumentIds);
+        return userService.updateUserInstruments(id, instrumentIds);
     }
 
-    // /api/users/me devuelve el perfil del usuario autenticado (extrae sub del token JWT y busca en DB con keycloakId).
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
-    @GetMapping("/me")
-    public UserDTO getMyProfile() {
-        // Extrae el IAM ID del usuario autenticado desde el contexto de seguridad
-        String iamId = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        return userService.getUserByIamId(iamId);
+    @GetMapping("/search")
+    public PaginatedResponse<UserDTO> searchUsers(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) Long instrumentId,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        return PaginatedResponse.from(
+                userService.searchUsers(firstName, lastName, email, active, instrumentId, pageable)
+        );
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")

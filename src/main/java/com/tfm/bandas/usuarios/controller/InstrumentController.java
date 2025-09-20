@@ -48,4 +48,17 @@ public class InstrumentController {
     public void delete(@PathVariable Long id) {
         instrumentService.deleteInstrument(id);
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
+    @GetMapping("/search")
+    public PaginatedResponse<InstrumentDTO> searchInstruments(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String voice,
+            @PageableDefault(size = 10) Pageable pageable) {
+
+        return PaginatedResponse.from(
+                instrumentService.searchInstruments(name, voice, pageable)
+        );
+    }
+
 }
