@@ -5,8 +5,8 @@ import com.tfm.bandas.usuarios.dto.UserDTO;
 import com.tfm.bandas.usuarios.dto.mapper.UserMapper;
 import com.tfm.bandas.usuarios.exception.BadRequestException;
 import com.tfm.bandas.usuarios.exception.NotFoundException;
-import com.tfm.bandas.usuarios.model.entity.Instrument;
-import com.tfm.bandas.usuarios.model.entity.UserProfile;
+import com.tfm.bandas.usuarios.model.entity.InstrumentEntity;
+import com.tfm.bandas.usuarios.model.entity.UserProfileEntity;
 import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
 import com.tfm.bandas.usuarios.model.specification.UserSpecifications;
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("User already registered with IAM id: " + dto.iamId());
         }
 
-        UserProfile userProfile = new UserProfile();
+        UserProfileEntity userProfile = new UserProfileEntity();
         userProfile.setIamId(dto.iamId());
         userProfile.setSystemSignupDate(dto.systemSignupDate() != null ? dto.systemSignupDate() : LocalDate.now());
         userProfile.setActive(true);
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUser(Long id, UserCreateDTO dto) {
-        UserProfile userProfile = userRepo.findById(id)
+        UserProfileEntity userProfile = userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
         // NO se actualiza iamId → es inmutable
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDTO(userRepo.save(userProfile));
     }
 
-    private void setMainUserInfo(UserCreateDTO dto, UserProfile userProfile) {
+    private void setMainUserInfo(UserCreateDTO dto, UserProfileEntity userProfile) {
         userProfile.setFirstName(dto.firstName());
         userProfile.setLastName(dto.lastName());
         userProfile.setSecondLastName(dto.secondLastName());
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
         userProfile.setBandJoinDate(dto.bandJoinDate());
 
         if (dto.instrumentIds() != null) {
-            Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
+            Set<InstrumentEntity> instruments = new HashSet<>(instrumentRepo.findAllById(dto.instrumentIds()));
             userProfile.setInstruments(instruments);
         }
     }
@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void disableUser(Long id) {
-        UserProfile user = userRepo.findById(id)
+        UserProfileEntity user = userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id " + id));
         user.setActive(false);
         userRepo.save(user);
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void enableUser(Long id) {
-        UserProfile user = userRepo.findById(id)
+        UserProfileEntity user = userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id " + id));
         user.setActive(true);
         userRepo.save(user);
@@ -140,10 +140,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUserInstruments(Long userId, Set<Long> instrumentIds) {
-        UserProfile userProfile = userRepo.findById(userId)
+        UserProfileEntity userProfile = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
         if (instrumentIds != null && !instrumentIds.isEmpty()) {
-            Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
+            Set<InstrumentEntity> instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
             userProfile.setInstruments(instruments);
         }
         return userMapper.toDTO(userRepo.save(userProfile));
@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public Page<UserDTO> searchUsers(String firstName, String lastName, String email, Boolean active, Long instrumentId, Pageable pageable) {
-        Specification<UserProfile> spec = Specification.allOf(
+        Specification<UserProfileEntity> spec = Specification.allOf(
                 UserSpecifications.firstNameContains(firstName),
                 UserSpecifications.lastNameContains(lastName),
                 UserSpecifications.emailContains(email),

@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserProfile {
+public class UserProfileEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +68,6 @@ public class UserProfile {
         joinColumns = @JoinColumn(name = "user_profile_id"),
         inverseJoinColumns = @JoinColumn(name = "instrument_id")
     )
-    private Set<Instrument> instruments = new HashSet<>();
+    private Set<InstrumentEntity> instruments = new HashSet<>();
 
 }

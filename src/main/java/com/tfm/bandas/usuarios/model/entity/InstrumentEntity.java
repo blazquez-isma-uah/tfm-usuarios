@@ -20,7 +20,7 @@ import java.util.Set;
         name = "instrument",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"instrument_name", "voice"})}
 )
-public class Instrument {
+public class InstrumentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +36,5 @@ public class Instrument {
 
     @ManyToMany(mappedBy = "instruments")
     @JsonIgnore
-    private Set<UserProfile> userProfiles = new HashSet<>();
+    private Set<UserProfileEntity> userProfiles = new HashSet<>();
 }
