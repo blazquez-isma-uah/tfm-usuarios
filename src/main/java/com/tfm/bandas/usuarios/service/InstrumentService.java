@@ -9,7 +9,7 @@ import java.util.List;
 public interface InstrumentService {
     Page<InstrumentDTO> getAllInstruments(Pageable pageable);
     InstrumentDTO getInstrumentById(Long id);
-    List<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName);
+    Page<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName, Pageable pageable);
     InstrumentDTO createInstrument(InstrumentDTO dto);
     void deleteInstrument(Long id);
     Page<InstrumentDTO> searchInstruments(String name, String voice, Pageable pageable);

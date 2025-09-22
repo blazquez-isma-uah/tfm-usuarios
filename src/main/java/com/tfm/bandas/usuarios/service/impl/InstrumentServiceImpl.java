@@ -5,8 +5,10 @@ import com.tfm.bandas.usuarios.dto.mapper.InstrumentMapper;
 import com.tfm.bandas.usuarios.exception.NotFoundException;
 import com.tfm.bandas.usuarios.model.entity.Instrument;
 import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
-import com.tfm.bandas.usuarios.model.specifications.InstrumentSpecifications;
+import com.tfm.bandas.usuarios.model.repository.UserRepository;
+import com.tfm.bandas.usuarios.model.specification.InstrumentSpecifications;
 import com.tfm.bandas.usuarios.service.InstrumentService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ public class InstrumentServiceImpl implements InstrumentService {
 
     private final InstrumentRepository instrumentRepo;
     private final InstrumentMapper instrumentMapper;
+    private final UserRepository userRepo;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,26 +43,26 @@ public class InstrumentServiceImpl implements InstrumentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName) {
-        return instrumentRepo.findByInstrumentNameContainingIgnoreCase(instrumentName)
-                .stream()
-                .map(instrumentMapper::toDTO)
-                .toList();
+    public Page<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName, Pageable pageable) {
+        return instrumentRepo.findByInstrumentNameContainingIgnoreCase(instrumentName, pageable)
+                .map(instrumentMapper::toDTO);
     }
 
     @Override
     @Transactional
     public InstrumentDTO createInstrument(InstrumentDTO dto) {
-        Instrument instrument = new Instrument();
-        instrument.setInstrumentName(dto.instrumentName());
-        instrument.setVoice(dto.voice());
+        Instrument instrument = instrumentMapper.toEntity(dto);
         return instrumentMapper.toDTO(instrumentRepo.save(instrument));
     }
 
     @Override
     @Transactional
     public void deleteInstrument(Long id) {
-        instrumentRepo.deleteById(id);
+        Instrument instrument = instrumentRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Instrument not found: " + id));
+        // Eliminar asignaciones de usuarios antes de borrar
+        userRepo.findAll().forEach(user -> user.getInstruments().remove(instrument));
+        instrumentRepo.delete(instrument);
     }
 
     @Override

@@ -33,8 +33,8 @@ public class InstrumentController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping("/search")
-    public List<InstrumentDTO> getByInstumentName(@RequestParam String instrumentName) {
-        return instrumentService.getInstrumentsByInstrumentName(instrumentName);
+    public PaginatedResponse<InstrumentDTO> getByInstumentName(@RequestParam String instrumentName, @PageableDefault(size = 10) Pageable pageable) {
+        return PaginatedResponse.from(instrumentService.getInstrumentsByInstrumentName(instrumentName, pageable));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

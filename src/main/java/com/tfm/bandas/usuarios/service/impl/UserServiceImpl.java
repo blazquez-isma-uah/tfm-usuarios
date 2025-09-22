@@ -9,7 +9,7 @@ import com.tfm.bandas.usuarios.model.entity.Instrument;
 import com.tfm.bandas.usuarios.model.entity.UserProfile;
 import com.tfm.bandas.usuarios.model.repository.InstrumentRepository;
 import com.tfm.bandas.usuarios.model.repository.UserRepository;
-import com.tfm.bandas.usuarios.model.specifications.UserSpecifications;
+import com.tfm.bandas.usuarios.model.specification.UserSpecifications;
 import com.tfm.bandas.usuarios.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -144,7 +144,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
         if (instrumentIds != null && !instrumentIds.isEmpty()) {
             Set<Instrument> instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
-            instruments = new HashSet<>(instrumentRepo.findAllById(instrumentIds));
             userProfile.setInstruments(instruments);
         }
         return userMapper.toDTO(userRepo.save(userProfile));

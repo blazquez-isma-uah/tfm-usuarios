@@ -1,4 +1,4 @@
-package com.tfm.bandas.usuarios.model.specifications;
+package com.tfm.bandas.usuarios.model.specification;
 
 import com.tfm.bandas.usuarios.model.entity.UserProfile;
 import com.tfm.bandas.usuarios.model.entity.Instrument;
