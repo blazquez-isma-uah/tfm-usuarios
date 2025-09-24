@@ -16,5 +16,4 @@ public interface UserRepository extends JpaRepository<UserProfileEntity, Long>,
     boolean existsByEmail(String email);
     Optional<UserProfileEntity> findByIamId(String iamId);
 
-    Page<UserProfileEntity> search(String firstName, String lastName, String email, Boolean active, Long instrumentId, Pageable pageable);
 }

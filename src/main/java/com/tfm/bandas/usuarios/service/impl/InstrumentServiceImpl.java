@@ -40,13 +40,6 @@ public class InstrumentServiceImpl implements InstrumentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<InstrumentDTO> getInstrumentsByInstrumentName(String instrumentName, Pageable pageable) {
-        return instrumentRepo.findByInstrumentNameContainingIgnoreCase(instrumentName, pageable)
-                .map(instrumentMapper::toDTO);
-    }
-
-    @Override
     @Transactional
     public InstrumentDTO createInstrument(InstrumentDTO dto) {
         InstrumentEntity instrument = instrumentMapper.toEntity(dto);
@@ -65,9 +58,9 @@ public class InstrumentServiceImpl implements InstrumentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InstrumentDTO> searchInstruments(String name, String voice, Pageable pageable) {
+    public Page<InstrumentDTO> searchInstruments(String instrumentName, String voice, Pageable pageable) {
         Specification<InstrumentEntity> spec = Specification.allOf(
-                InstrumentSpecifications.nameContains(name),
+                InstrumentSpecifications.instrumentNameContains(instrumentName),
                 InstrumentSpecifications.voiceContains(voice));
 
         return instrumentRepo.findAll(spec, pageable).map(instrumentMapper::toDTO);

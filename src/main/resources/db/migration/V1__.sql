@@ -24,11 +24,11 @@ CREATE TABLE user_profile
     CONSTRAINT pk_user_profile PRIMARY KEY (id)
 );
 
-CREATE TABLE user_profile_instruments
+CREATE TABLE user_profile_instrument
 (
-    instruments_id   BIGINT NOT NULL,
-    user_profiles_id BIGINT NOT NULL,
-    CONSTRAINT pk_user_profile_instruments PRIMARY KEY (instruments_id, user_profiles_id)
+    instrument_id   BIGINT NOT NULL,
+    user_profile_id BIGINT NOT NULL,
+    CONSTRAINT pk_user_profile_instrument PRIMARY KEY (instrument_id, user_profile_id)
 );
 
 ALTER TABLE instrument
@@ -40,11 +40,11 @@ ALTER TABLE user_profile
 ALTER TABLE user_profile
     ADD CONSTRAINT uc_user_profile_iamid UNIQUE (iam_id);
 
-ALTER TABLE user_profile_instruments
-    ADD CONSTRAINT fk_useproins_on_instrument FOREIGN KEY (instruments_id) REFERENCES instrument (id);
+ALTER TABLE user_profile_instrument
+    ADD CONSTRAINT fk_useproins_on_instrument FOREIGN KEY (instrument_id) REFERENCES instrument (id);
 
-ALTER TABLE user_profile_instruments
-    ADD CONSTRAINT fk_useproins_on_user_profile FOREIGN KEY (user_profiles_id) REFERENCES user_profile (id);
+ALTER TABLE user_profile_instrument
+    ADD CONSTRAINT fk_useproins_on_user_profile FOREIGN KEY (user_profile_id) REFERENCES user_profile (id);
 
 
 INSERT INTO instrument (id,instrument_name,voice) VALUES (5,'Clarinete','1');

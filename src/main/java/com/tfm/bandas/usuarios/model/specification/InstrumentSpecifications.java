@@ -5,9 +5,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class InstrumentSpecifications {
 
-    public static Specification<InstrumentEntity> nameContains(String name) {
+    public static Specification<InstrumentEntity> instrumentNameContains(String instrumentName) {
         return (root, query, cb) ->
-                name == null ? null : cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
+                instrumentName == null ? null : cb.like(cb.lower(root.get("instrumentName")), "%" + instrumentName.toLowerCase() + "%");
     }
 
     public static Specification<InstrumentEntity> voiceContains(String voice) {

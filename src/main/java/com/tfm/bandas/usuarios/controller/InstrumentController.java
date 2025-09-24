@@ -30,12 +30,6 @@ public class InstrumentController {
         return instrumentService.getInstrumentById(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
-    @GetMapping("/search")
-    public PaginatedResponse<InstrumentDTO> getByInstumentName(@RequestParam String instrumentName, @PageableDefault(size = 10) Pageable pageable) {
-        return PaginatedResponse.from(instrumentService.getInstrumentsByInstrumentName(instrumentName, pageable));
-    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public InstrumentDTO create(@RequestBody @Valid InstrumentDTO dto) {
@@ -51,12 +45,12 @@ public class InstrumentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping("/search")
     public PaginatedResponse<InstrumentDTO> searchInstruments(
-            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String instrumentName,
             @RequestParam(required = false) String voice,
             @PageableDefault(size = 10) Pageable pageable) {
 
         return PaginatedResponse.from(
-                instrumentService.searchInstruments(name, voice, pageable)
+                instrumentService.searchInstruments(instrumentName, voice, pageable)
         );
     }
 
