@@ -55,6 +55,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public UserDTO getUserByUsername(String username) {
+        return userRepo.findByUsername(username) // Asumimos que el username es el email
+                .map(userMapper::toDTO)
+                .orElseThrow(() -> new NotFoundException("User not found with username: " + username));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public UserDTO getUserByIamId(String iamId) {
         return userRepo.findByIamId(iamId)
                 .map(userMapper::toDTO)
@@ -94,6 +102,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void setMainUserInfo(UserCreateDTO dto, UserProfileEntity userProfile) {
+        userProfile.setUsername(dto.username());
         userProfile.setFirstName(dto.firstName());
         userProfile.setLastName(dto.lastName());
         userProfile.setSecondLastName(dto.secondLastName());
@@ -151,8 +160,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserDTO> searchUsers(String firstName, String lastName, String email, Boolean active, Long instrumentId, Pageable pageable) {
+    public Page<UserDTO> searchUsers(String username, String firstName, String lastName, String email, Boolean active, Long instrumentId, Pageable pageable) {
         Specification<UserProfileEntity> spec = Specification.allOf(
+                UserSpecifications.usernameContains(username),
                 UserSpecifications.firstNameContains(firstName),
                 UserSpecifications.lastNameContains(lastName),
                 UserSpecifications.emailContains(email),

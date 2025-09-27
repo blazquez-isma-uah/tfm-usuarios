@@ -10,6 +10,7 @@ import java.util.Set;
 // Entrada: creación de usuario
 public record UserCreateDTO(
         @NotBlank String iamId,
+        @NotBlank String username,
         @NotBlank String firstName,
         @NotBlank String lastName,
         String secondLastName,

@@ -10,6 +10,7 @@ CREATE TABLE user_profile
 (
     id                  BIGINT AUTO_INCREMENT NOT NULL,
     iam_id              VARCHAR(255) NOT NULL,
+    username            VARCHAR(255) NOT NULL,
     first_name          VARCHAR(255) NOT NULL,
     last_name           VARCHAR(255) NOT NULL,
     second_last_name    VARCHAR(255) NULL,

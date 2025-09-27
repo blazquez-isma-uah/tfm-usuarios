@@ -25,6 +25,10 @@ public class UserProfileEntity {
     @NotNull
     private String iamId; // ID del usuario en el sistema de autenticación externo (claims sub)
 
+    @Column(name = "username", unique = true, nullable = false)
+    @NotNull
+    private String username; // Nombre de usuario único dentro del sistema
+
     @Column(name = "first_name", nullable = false)
     @NotNull
     private String firstName;

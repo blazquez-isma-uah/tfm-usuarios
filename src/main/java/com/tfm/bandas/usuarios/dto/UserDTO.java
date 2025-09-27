@@ -6,6 +6,7 @@ import java.util.Set;
 // Salida: datos públicos de usuario
 public record UserDTO(
         Long id,
+        String username,
         String iamId,
         String firstName,
         String lastName,

@@ -40,6 +40,12 @@ public class UserController {
         return userService.getUserByEmail(email);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
+    @GetMapping("/username/{username}")
+    public UserDTO getUserByUsername(@PathVariable String username) {
+        return userService.getUserByUsername(username);
+    }
+
     // get user by iamId solo para admin
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/iam/{iamId}")
@@ -86,6 +92,7 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN', 'MUSICIAN')")
     @GetMapping("/search")
     public PaginatedResponse<UserDTO> searchUsers(
+            @RequestParam(required = false) String username,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
@@ -94,7 +101,7 @@ public class UserController {
             @PageableDefault(size = 10) Pageable pageable) {
 
         return PaginatedResponse.from(
-                userService.searchUsers(firstName, lastName, email, active, instrumentId, pageable)
+                userService.searchUsers(username, firstName, lastName, email, active, instrumentId, pageable)
         );
     }
 

@@ -7,6 +7,11 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecifications {
 
+    public static Specification<UserProfileEntity> usernameContains(String username) {
+        return (root, query, cb) ->
+                username == null ? null : cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%");
+    }
+
     public static Specification<UserProfileEntity> firstNameContains(String firstName) {
         return (root, query, cb) ->
                 firstName == null ? null : cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%");
