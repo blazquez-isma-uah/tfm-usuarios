@@ -63,7 +63,7 @@ public class UserPictureController {
         return ResponseEntity.ok(new PictureUrlResponseDTO(url));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','MUSICIAN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<PictureUrlResponseDTO> getPictureUrlForUser(@PathVariable Long userId) {
         String iamId = userService.getUserById(userId).iamId();
